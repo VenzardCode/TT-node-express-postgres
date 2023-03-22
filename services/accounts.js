@@ -6,7 +6,7 @@ const db = require('./db');
  */
 async function getAll() {
 
-  const rows = await db.query(`
+  const { rows } = await db.query(`
     SELECT users.id,username,email,role,datecreate,firstname,lastname,state 
     FROM users 
     LEFT JOIN profiles ON users.profileid = profiles.id`);
@@ -21,7 +21,7 @@ async function getAll() {
  */
 async function getByRole(role) {
 
-  const rows = await db.query(`
+  const { rows } = await db.query(`
     SELECT users.id,username,email,role,datecreate,firstname,lastname,state
     FROM users 
     LEFT JOIN profiles ON users.profileid = profiles.id
@@ -40,17 +40,20 @@ async function getByRole(role) {
  * @param {string} state the gender of the user
  */
 async function setById(id, username, email, role, firstname, lastname, state) {
-  await db.query(`
+  const { rowCount } = await db.query(`
   UPDATE profiles 
   SET firstname =$2,lastname=$3,state =$4
   from users 
   WHERE users.profileid = profiles.id AND users.id=$1;
   `, [id, firstname, lastname, state]);
-  await db.query(`
+  if (rowCount != 0) {
+    await db.query(`
   UPDATE users 
   SET username =$2,email =$3,role=$4  
   WHERE users.id=$1
   `, [id, username, email, role]);
+  }
+  return rowCount;
 }
 /**
  * creates user which parameters
@@ -77,7 +80,7 @@ SELECT $4,$5,$6, profileid FROM x;`, [firstname, lastname, state, username, emai
  * @param {number} id the id of the user
  */
 async function deleteById(id) {
-  await db.query(`WITH x AS(
+  const { rowCount } = await db.query(`WITH x AS(
     DELETE FROM users
     WHERE id=$1
     RETURNING profileid
@@ -85,8 +88,10 @@ async function deleteById(id) {
 DELETE FROM profiles
 USING x
 WHERE profiles.id=x.profileid`, [id]);
+  return rowCount;
 
 }
+
 
 module.exports = {
   deleteById,

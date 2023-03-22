@@ -4,16 +4,16 @@ const accounts = require('../services/accounts');
 
 /* GET accounts listing. */
 router.get('/', async function (req, res, next) {
-  res.json(await accounts.getAll());
+  res.status(200).json(await accounts.getAll());
 });
 router.get('/:role', async function (req, res, next) {
   if (req.params == null) req.params = {};
   const role = req.params.role;
   if (role == null || !(role == "admin" || role == "user")) {
-    res.json({ error: "Invalid role" });
+    res.status(400).json({ error: "Invalid role" });
   }
   else {
-    res.json(await accounts.getByRole(role));
+    res.status(200).json(await accounts.getByRole(role));
   }
 });
 /* POST accounts creation. */
@@ -21,10 +21,10 @@ router.post('/', async function (req, res, next) {
   const errors = validate(req.body);
   if (errors.length == 0) {
     await accounts.create(req.body.firstname, req.body.lastname, req.body.state, req.body.username, req.body.email, req.body.role);
-    res.json({ result: 'ok' })
+    res.status(200).json({ result: 'Ok' })
   }
   else {
-    res.json({ errors: errors })
+    res.status(400).json({ errors: errors })
   }
 });
 
@@ -36,22 +36,34 @@ router.post('/:id', async function (req, res, next) {
     errors.push("Invalid id");
   }
   if (errors.length == 0) {
-    await accounts.setById(id, req.body.username, req.body.email, req.body.role, req.body.firstname, req.body.lastname, req.body.state);
-    res.json({ result: 'ok' })
+    const result = await accounts.setById(id, req.body.username, req.body.email, req.body.role, req.body.firstname, req.body.lastname, req.body.state);
+    if (result == 0) {
+      res.status(404).json({ errors: ['Account not found'] })
+    }
+    else {
+      res.status(200).json({ result: 'Ok' })
+    }
   }
   else {
-    res.json({ errors: errors })
+    res.status(400).json({ errors: errors })
   }
 });
+/* DELETE accounts removal */
+
 router.delete('/:id', async function (req, res, next) {
   if (req.params == null) req.params = {};
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
-    res.json({ error: "id is invalid" });
+    res.status(400).json({ error: "Invalid id" });
   }
   else {
-    await accounts.deleteById(id)
-    res.json({ result: 'ok' });
+    const result = await accounts.deleteById(id)
+    if (result == 0) {
+      res.status(404).json({ error: 'Account not found' })
+    }
+    else {
+      res.status(200).json({ result: 'Ok' });
+    }
   }
 });
 /**
