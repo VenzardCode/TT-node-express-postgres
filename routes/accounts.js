@@ -111,9 +111,9 @@ function validate(body) {
 */
 function validateRequiredField(field) {
   if (field == null || field.trim() == "") {
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 module.exports = router;
