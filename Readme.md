@@ -24,15 +24,18 @@
   * **Code:** 200 <br />
     **Content:**
     ```json
-    [{"id":1,
+    [{
+    "id":1,
     "username":"Den004",
     "email":"Den@gmail.com",
     "role":"admin",
     "datecreate":"2023-03-22T14:54:24.612Z",
     "firstname":"Dan",
     "lastname":"Sanche",
-    "state":"male"},
-    {...},]
+    "state":"male"
+    },
+    {...},
+    ]
     ```
 
 ## Get accounts by role
@@ -61,15 +64,18 @@
   * **Code:** 200 <br />
     **Content:**
     ```json
-    [{"id":1,
+    [{
+    "id":1,
     "username":"Den004",
     "email":"Den@gmail.com",
     "role":"admin",
     "datecreate":"2023-03-22T14:54:24.612Z",
     "firstname":"Dan",
     "lastname":"Sanche",
-    "state":"male"},
-    {...}]
+    "state":"male"
+    },
+    {...}
+    ]
     ```
  
 * **Error Response:**

@@ -3,31 +3,35 @@ const router = express.Router();
 const accounts = require('../services/accounts');
 
 /* GET accounts listing. */
+
+/*Get all accounts*/
 router.get('/', async function (req, res, next) {
   res.status(200).json(await accounts.getAll());
 });
+
+/*Get accounts by role*/
 router.get('/:role', async function (req, res, next) {
   if (req.params == null) req.params = {};
   const role = req.params.role;
   if (role == null || !(role == "admin" || role == "user")) {
     res.status(400).json({ error: "Invalid role" });
   }
-  else {
-    res.status(200).json(await accounts.getByRole(role));
-  }
+  res.status(200).json(await accounts.getByRole(role));
 });
+
 /* POST accounts creation. */
+
+/*Create account*/
 router.post('/', async function (req, res, next) {
   const errors = validate(req.body);
   if (errors.length == 0) {
     await accounts.create(req.body.firstname, req.body.lastname, req.body.state, req.body.username, req.body.email, req.body.role);
     res.status(200).json({ result: 'Ok' })
   }
-  else {
-    res.status(400).json({ errors: errors })
-  }
+  res.status(400).json({ errors: errors })
 });
 
+/*Modify account by id*/
 router.post('/:id', async function (req, res, next) {
   if (req.params == null) req.params = {};
   const errors = validate(req.body);
@@ -40,16 +44,14 @@ router.post('/:id', async function (req, res, next) {
     if (result == 0) {
       res.status(404).json({ errors: ['Account not found'] })
     }
-    else {
-      res.status(200).json({ result: 'Ok' })
-    }
+    res.status(200).json({ result: 'Ok' })
   }
-  else {
-    res.status(400).json({ errors: errors })
-  }
+  res.status(400).json({ errors: errors })
 });
+
 /* DELETE accounts removal */
 
+/*Delete account by id*/
 router.delete('/:id', async function (req, res, next) {
   if (req.params == null) req.params = {};
   const id = parseInt(req.params.id);
@@ -61,11 +63,10 @@ router.delete('/:id', async function (req, res, next) {
     if (result == 0) {
       res.status(404).json({ error: 'Account not found' })
     }
-    else {
-      res.status(200).json({ result: 'Ok' });
-    }
+    res.status(200).json({ result: 'Ok' });
   }
 });
+
 /**
  * Validate the account details
  * @param {any} body 
@@ -80,24 +81,39 @@ function validate(body) {
   const username = body.username;
   const email = body.email;
   const role = body.role;
-  if (firstname == null || firstname.trim() == "") {
+
+  if (validateRequiredField(firstname)) {
     errors.push("Invalid first name");
   }
-  if (lastname == null || lastname.trim() == "") {
+  if (validateRequiredField(lastname)) {
     errors.push("Invalid last name");
   }
-  if (state == null || !(state == "male" || state == "female")) {
+  if (validateRequiredField(state) || !(state == "male" || state == "female")) {
     errors.push("Invalid gender");
   }
-  if (username == null || username.trim() == "") {
+  if (validateRequiredField(username)) {
     errors.push("Invalid user name");
   }
-  if (email == null || email.trim() == "" || email.match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/) == null) {
+  if (validateRequiredField(email) || email.match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/) == null) {
     errors.push("Invalid email");
   }
-  if (role == null || !(role == "admin" || role == "user")) {
+  if (validateRequiredField(role) || !(role == "user" || role == "admin")) {
     errors.push("Invalid role");
   }
+  
   return errors;
 }
+
+/**
+* Validate feald is not null or empty
+* @param {any} field 
+* @returns {boolean}  
+*/
+function validateRequiredField(field) {
+  if (field == null || field.trim() == "") {
+    return false;
+  }
+  return true;
+}
+
 module.exports = router;
