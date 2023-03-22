@@ -13,6 +13,7 @@ async function getAll() {
   return rows ?? [];
 
 }
+
 /**
  * Gets all users by their role.
  * @param {string} role The role.
@@ -28,7 +29,9 @@ async function getByRole(role) {
     WHERE role = $1`, [role]);
   return rows ?? [];
 
+
 }
+
 /**
  * sets parameters of the user by id
  * @param {number} id the id of the user
@@ -55,6 +58,7 @@ async function setById(id, username, email, role, firstname, lastname, state) {
   }
   return rowCount;
 }
+
 /**
  * creates user which parameters
  * @param {string} firstname the first name of the user
@@ -91,7 +95,6 @@ WHERE profiles.id=x.profileid`, [id]);
   return rowCount;
 
 }
-
 
 module.exports = {
   deleteById,

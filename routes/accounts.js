@@ -15,6 +15,7 @@ router.get('/:role', async function (req, res, next) {
   const role = req.params.role;
   if (role == null || !(role == "admin" || role == "user")) {
     res.status(400).json({ error: "Invalid role" });
+    return;
   }
   res.status(200).json(await accounts.getByRole(role));
 });
@@ -27,6 +28,7 @@ router.post('/', async function (req, res, next) {
   if (errors.length == 0) {
     await accounts.create(req.body.firstname, req.body.lastname, req.body.state, req.body.username, req.body.email, req.body.role);
     res.status(200).json({ result: 'Ok' })
+    return;
   }
   res.status(400).json({ errors: errors })
 });
@@ -43,8 +45,10 @@ router.post('/:id', async function (req, res, next) {
     const result = await accounts.setById(id, req.body.username, req.body.email, req.body.role, req.body.firstname, req.body.lastname, req.body.state);
     if (result == 0) {
       res.status(404).json({ errors: ['Account not found'] })
+      return;
     }
     res.status(200).json({ result: 'Ok' })
+    return;
   }
   res.status(400).json({ errors: errors })
 });
@@ -57,11 +61,13 @@ router.delete('/:id', async function (req, res, next) {
   const id = parseInt(req.params.id);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
+    return;
   }
   else {
     const result = await accounts.deleteById(id)
     if (result == 0) {
       res.status(404).json({ error: 'Account not found' })
+      return;
     }
     res.status(200).json({ result: 'Ok' });
   }
@@ -100,7 +106,7 @@ function validate(body) {
   if (validateRequiredField(role) || !(role == "user" || role == "admin")) {
     errors.push("Invalid role");
   }
-  
+
   return errors;
 }
 
@@ -110,7 +116,7 @@ function validate(body) {
 * @returns {boolean}  
 */
 function validateRequiredField(field) {
-  if (field == null || field.trim() == "") {
+  if (field == null || typeof field != 'string' || field.trim() == "") {
     return true;
   }
   return false;
