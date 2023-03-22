@@ -6,7 +6,7 @@ const config = {
     port: env.DB_PORT || '5432',
     user: env.DB_USER || 'postgres',
     password: env.DB_PASSWORD || '4y7sV96vA9wv46VR',
-    database: env.DB_NAME || 'accounts',
+    database: env.DB_NAME || 'postgres',
   },
   listPerPage: env.LIST_PER_PAGE || 10,
 };
